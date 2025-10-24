@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "version": "1.0",
+    "created_at": "2025-10-24T00:00:00Z",
+    "generator": "example-llm",
+    "checklist_source": "LLM_CHECKLIST.md",
+    "llm_limitations": {
+      "context_limit": "Summarize, then verify critical lines.",
+      "hallucination_policy": "Attach path:line or command evidence for all claims.",
+      "deterministic_loop": "Execute exactly one next_step before re-planning.",
+      "memory_logging": "Persist assumptions/decisions in open_questions and references.",
+      "tool_crosscheck": "Cross-verify results via lint/tests and logs."
+    }
+  },
+  "inputs": {
+    "purpose": "Design and validate an MVP orchestrator and agent runtime.",
+    "scope": "Scaffold modules, minimal CLI serve, basic routing & mock tools, tests & lint.",
+    "success_metrics": [
+      "pytest -q passes",
+      "ruff check shows 0 warnings",
+      "CLI serve command runs"
+    ],
+    "deliverable_formats": ["code-diff", "test-logs", "docs-paths"],
+    "constraints": {
+      "filesystem": "workspace-write",
+      "network": "restricted",
+      "approvals": "on-request",
+      "sensitive_data": false,
+      "time_budget_hours": 4
+    },
+    "assumptions": [
+      "Python 3.11+ available",
+      "No external API calls without approval"
+    ]
+  },
+  "plan": [
+    {
+      "id": "P1",
+      "name": "Project scaffolding",
+      "goal": "Create directories and minimal package structure per AGENTS.md.",
+      "success_criteria": ["Required dirs exist", "ruff check runs", "pytest discovers tests"],
+      "deliverables": ["src/llm/__init__.py", "tests/unit/placeholder_test.py"],
+      "validation": {
+        "unit": ["tests/unit/placeholder_test.py"],
+        "integration": [],
+        "evidence": ["ruff check src agents", "pytest -q"]
+      },
+      "dependencies": [],
+      "owner": "LLM",
+      "risk_level": "low"
+    },
+    {
+      "id": "P2",
+      "name": "CLI orchestrator stub",
+      "goal": "Add minimal llm.cli serve entry.",
+      "success_criteria": ["serve prints startup log", "reads configs/dev.yaml"],
+      "deliverables": ["src/llm/cli.py", "configs/dev.yaml"],
+      "validation": {
+        "unit": ["tests/unit/test_cli.py"],
+        "integration": [],
+        "evidence": ["python -m llm.cli serve --config configs/dev.yaml | head -n 3"]
+      },
+      "dependencies": ["P1"],
+      "owner": "LLM",
+      "risk_level": "medium"
+    },
+    {
+      "id": "P3",
+      "name": "Agent manifest + entrypoint",
+      "goal": "Load a sample agent manifest and route requests.",
+      "success_criteria": ["manifest loads", "route selects tool"],
+      "deliverables": ["agents/sample.yaml", "src/llm/planning/router.py"],
+      "validation": {
+        "unit": ["tests/unit/test_router.py"],
+        "integration": ["tests/integration/test_sample_agent.py"],
+        "evidence": ["pytest -q -k router"]
+      },
+      "dependencies": ["P2"],
+      "owner": "LLM",
+      "risk_level": "medium"
+    },
+    {
+      "id": "P4",
+      "name": "Tool adapter mocks",
+      "goal": "Implement two mock tool adapters and wire routing.",
+      "success_criteria": ["mock tools return", "router calls tool"],
+      "deliverables": ["src/llm/io/tools.py", "tests/unit/test_tools.py"],
+      "validation": {
+        "unit": ["tests/unit/test_tools.py"],
+        "integration": ["tests/integration/test_agent_tools.py"],
+        "evidence": ["pytest -q -k tools"]
+      },
+      "dependencies": ["P3"],
+      "owner": "LLM",
+      "risk_level": "medium"
+    },
+    {
+      "id": "P5",
+      "name": "Quality & security baseline",
+      "goal": "Lint/format hooks, configs examples, logging policy.",
+      "success_criteria": ["0 ruff warnings", ".example committed"],
+      "deliverables": ["configs/README.md", "configs/dev.yaml", "configs/dev.yaml.example"],
+      "validation": {
+        "unit": [],
+        "integration": [],
+        "evidence": ["ruff check src agents"]
+      },
+      "dependencies": ["P1"],
+      "owner": "LLM",
+      "risk_level": "low"
+    }
+  ],
+  "validation": {
+    "lint": ["ruff check src agents", "ruff format --check src agents"],
+    "tests": ["pytest -q"],
+    "coverage": ">=85% on planners and safety-critical modules",
+    "logging": ["Collect serve startup logs", "Capture failing test output"]
+  },
+  "risks": [
+    {"risk": "Ambiguous requirements", "impact": "medium", "mitigation": "Confirm success metrics early", "trigger": "Missing acceptance tests"},
+    {"risk": "Destructive actions", "impact": "high", "mitigation": "Approval gate + backups", "trigger": "rm/migration detected"}
+  ],
+  "release": {
+    "summary": "MVP runtime, CLI, routing, mocks, tests, lint",
+    "migration": ["None for MVP"],
+    "rollback": ["Revert diff", "Disable new CLI entry"],
+    "docs_updates": ["docs/README.md", "agents/README.md"]
+  },
+  "references": [
+    {"claim": "Repo structure rules", "evidence": "AGENTS.md:3"},
+    {"claim": "Run serve command", "evidence": "AGENTS.md:17"},
+    {"claim": "LLM limitations policy", "evidence": "LLM_CHECKLIST.md:49"}
+  ],
+  "open_questions": [
+    "Target models and token limits?",
+    "Do we require Dockerized dev env?"
+  ],
+  "next_step": {
+    "step_id": "P1",
+    "prompt": "Create directories and minimal package files; verify ruff and pytest run."
+  }
+}
+
