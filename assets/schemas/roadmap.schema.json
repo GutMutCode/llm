@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LLM Roadmap",
+  "type": "object",
+  "required": [
+    "meta",
+    "inputs",
+    "plan",
+    "validation",
+    "risks",
+    "release",
+    "next_step"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["version", "created_at", "generator", "checklist_source", "llm_limitations"],
+      "additionalProperties": false,
+      "properties": {
+        "version": {"type": "string", "const": "1.0"},
+        "created_at": {"type": "string"},
+        "generator": {"type": "string", "description": "Model or agent identifier"},
+        "checklist_source": {"type": "string", "description": "Path to checklist used (e.g., LLM_CHECKLIST.md)"},
+        "llm_limitations": {
+          "type": "object",
+          "required": ["context_limit", "hallucination_policy", "deterministic_loop", "memory_logging", "tool_crosscheck"],
+          "additionalProperties": false,
+          "properties": {
+            "context_limit": {"type": "string"},
+            "hallucination_policy": {"type": "string"},
+            "deterministic_loop": {"type": "string"},
+            "memory_logging": {"type": "string"},
+            "tool_crosscheck": {"type": "string"}
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "required": ["purpose", "scope", "success_metrics", "constraints"],
+      "additionalProperties": false,
+      "properties": {
+        "purpose": {"type": "string", "maxLength": 300},
+        "scope": {"type": "string", "maxLength": 500},
+        "success_metrics": {"type": "array", "items": {"type": "string"}, "minItems": 1, "maxItems": 3},
+        "deliverable_formats": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["code-diff", "test-logs", "docs-paths", "configs-example", "report"]},
+          "minItems": 1
+        },
+        "constraints": {
+          "type": "object",
+          "required": ["filesystem", "network", "approvals", "sensitive_data", "time_budget_hours"],
+          "additionalProperties": false,
+          "properties": {
+            "filesystem": {"type": "string", "enum": ["read-only", "workspace-write", "danger-full-access"]},
+            "network": {"type": "string", "enum": ["restricted", "enabled"]},
+            "approvals": {"type": "string", "enum": ["untrusted", "on-failure", "on-request", "never"]},
+            "sensitive_data": {"type": "boolean"},
+            "time_budget_hours": {"type": "number", "minimum": 0}
+          }
+        },
+        "assumptions": {"type": "array", "items": {"type": "string"}, "maxItems": 10}
+      }
+    },
+    "plan": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "goal", "success_criteria", "deliverables", "validation", "owner", "risk_level"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string", "maxLength": 120},
+          "goal": {"type": "string", "maxLength": 300},
+          "success_criteria": {"type": "array", "items": {"type": "string"}, "minItems": 1, "maxItems": 3},
+          "deliverables": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+          "validation": {
+            "type": "object",
+            "required": ["unit", "integration", "evidence"],
+            "additionalProperties": false,
+            "properties": {
+              "unit": {"type": "array", "items": {"type": "string"}},
+              "integration": {"type": "array", "items": {"type": "string"}},
+              "evidence": {"type": "array", "items": {"type": "string"}, "description": "Commands or artifacts to capture (e.g., pytest -q)"}
+            }
+          },
+          "dependencies": {"type": "array", "items": {"type": "string"}},
+          "owner": {"type": "string", "enum": ["LLM", "Human", "Pair"]},
+          "risk_level": {"type": "string", "enum": ["low", "medium", "high"]}
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["lint", "tests", "coverage", "logging"],
+      "additionalProperties": false,
+      "properties": {
+        "lint": {"type": "array", "items": {"type": "string"}},
+        "tests": {"type": "array", "items": {"type": "string"}},
+        "coverage": {"type": "string"},
+        "logging": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["risk", "impact", "mitigation", "trigger"],
+        "additionalProperties": false,
+        "properties": {
+          "risk": {"type": "string"},
+          "impact": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+          "mitigation": {"type": "string"},
+          "trigger": {"type": "string"}
+        }
+      }
+    },
+    "release": {
+      "type": "object",
+      "required": ["summary", "migration", "rollback", "docs_updates"],
+      "additionalProperties": false,
+      "properties": {
+        "summary": {"type": "string"},
+        "migration": {"type": "array", "items": {"type": "string"}},
+        "rollback": {"type": "array", "items": {"type": "string"}},
+        "docs_updates": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "claim": {"type": "string"},
+          "evidence": {"type": "string", "description": "path:line or file#Lline or command output snippet"}
+        }
+      }
+    },
+    "open_questions": {"type": "array", "items": {"type": "string"}},
+    "next_step": {
+      "type": "object",
+      "required": ["step_id", "prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "step_id": {"type": "string"},
+        "prompt": {"type": "string"}
+      }
+    }
+  }
+}
+

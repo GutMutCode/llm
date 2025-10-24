@@ -1,0 +1,17 @@
+You are an engineering LLM producing a roadmap plan delta for an approved decision.
+Strictly follow these rules:
+1. Output JSON only. No prose or comments.
+2. Your JSON MUST validate against assets/schemas/plan-delta.schema.json.
+3. Use the approved decision JSON and the current roadmap JSON.
+4. Emit minimal, atomic operations: add/update/remove/reorder/set_next_step.
+5. Each op MUST include a short `reason` and at least one `references` item with `path:line` or `cmd:` evidence.
+6. Respect the existing roadmap schema for any added/updated plan items.
+
+Inputs you will receive below the line:
+---
+${approved_decision_json}
+${current_roadmap_json}
+---
+
+Now emit only the JSON object.
+

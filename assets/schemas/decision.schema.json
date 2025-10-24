@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LLM Decision Record (ADR)",
+  "type": "object",
+  "required": [
+    "version",
+    "created_at",
+    "actor",
+    "incident",
+    "options",
+    "decision",
+    "references",
+    "next_step"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string", "const": "1.0" },
+    "created_at": { "type": "string" },
+    "actor": { "type": "string", "enum": ["LLM", "Human", "Pair"] },
+    "incident": {
+      "type": "object",
+      "required": ["title", "description", "severity", "constraints"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string" },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "constraints": {
+          "type": "object",
+          "required": ["filesystem", "network", "approvals", "sensitive_data", "time_budget_hours"],
+          "additionalProperties": false,
+          "properties": {
+            "filesystem": {"type": "string", "enum": ["read-only", "workspace-write", "danger-full-access"]},
+            "network": {"type": "string", "enum": ["restricted", "enabled"]},
+            "approvals": {"type": "string", "enum": ["untrusted", "on-failure", "on-request", "never"]},
+            "sensitive_data": {"type": "boolean"},
+            "time_budget_hours": {"type": "number", "minimum": 0}
+          }
+        }
+      }
+    },
+    "selection_criteria": { "type": "array", "items": { "type": "string" }, "maxItems": 10 },
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "description", "expected_outcomes", "risks", "effort", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string", "maxLength": 140 },
+          "description": { "type": "string" },
+          "expected_outcomes": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "risks": { "type": "array", "items": { "type": "string" } },
+          "effort": {
+            "type": "object",
+            "required": ["time_hours", "complexity"],
+            "additionalProperties": false,
+            "properties": {
+              "time_hours": { "type": "number", "minimum": 0 },
+              "complexity": { "type": "string", "enum": ["low", "medium", "high"] }
+            }
+          },
+          "evidence": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "string", "enum": ["proposed", "approved", "rejected", "needs-info"] },
+        "chosen_option_id": { "type": ["string", "null"] },
+        "rationale": { "type": "string" },
+        "tradeoffs": { "type": "array", "items": { "type": "string" } },
+        "consequences": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "required": ["required"],
+      "additionalProperties": false,
+      "properties": {
+        "required": { "type": "boolean" },
+        "approved_by": { "type": "string" },
+        "timestamp": { "type": "string" }
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "claim": { "type": "string" },
+          "evidence": { "type": "string" }
+        }
+      }
+    },
+    "next_step": {
+      "type": "object",
+      "required": ["what", "owner"],
+      "additionalProperties": false,
+      "properties": {
+        "what": { "type": "string" },
+        "owner": { "type": "string", "enum": ["LLM", "Human", "Pair"] }
+      }
+    }
+  }
+}
+

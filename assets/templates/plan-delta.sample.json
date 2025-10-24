@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "created_at": "2025-10-24T00:05:00Z",
+  "decision_id": "ADR-2025-10-24-001",
+  "target": "assets/templates/roadmap.sample.json",
+  "ops": [
+    {
+      "op": "update",
+      "id": "P1",
+      "fields": {
+        "success_criteria": ["Required dirs exist", "ruff check runs", "pytest discovers tests"],
+        "validation": {
+          "unit": ["tests/unit/placeholder_test.py"],
+          "integration": [],
+          "evidence": ["ruff check src agents", "pytest -q"]
+        }
+      },
+      "reason": "Align with authoring checklist and ensure evidence commands exist.",
+      "references": ["assets/prompts/roadmap/authoring_checklist.md:25", "AGENTS.md:17"]
+    },
+    {
+      "op": "set_next_step",
+      "step_id": "P1",
+      "prompt": "Run ruff and pytest locally and capture logs.",
+      "reason": "Make next action explicit and testable.",
+      "references": ["LLM_CHECKLIST.md:27"]
+    },
+    {
+      "op": "reorder",
+      "order": ["P1", "P5", "P2", "P3", "P4"],
+      "reason": "Front-load low-risk scaffolding and quality baseline.",
+      "references": ["assets/templates/roadmap.sample.json:79"]
+    }
+  ]
+}
+

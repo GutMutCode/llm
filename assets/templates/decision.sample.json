@@ -1,0 +1,53 @@
+{
+  "version": "1.0",
+  "created_at": "2025-10-24T00:00:00Z",
+  "actor": "LLM",
+  "incident": {
+    "title": "Unexpected schema mismatch when validating roadmap",
+    "description": "CI failed on roadmap JSON due to missing 'next_step'. We need options to fix quickly without breaking consumers.",
+    "severity": "medium",
+    "constraints": {
+      "filesystem": "workspace-write",
+      "network": "restricted",
+      "approvals": "on-request",
+      "sensitive_data": false,
+      "time_budget_hours": 1
+    }
+  },
+  "selection_criteria": [
+    "Fix CI within 1 hour",
+    "Avoid schema churn"
+  ],
+  "options": [
+    {
+      "id": "O1",
+      "title": "Add minimal next_step to roadmap",
+      "description": "Update roadmap JSON to include a placeholder next_step matching schema.",
+      "expected_outcomes": ["CI turns green"],
+      "risks": ["None significant"],
+      "effort": {"time_hours": 0.2, "complexity": "low"},
+      "evidence": ["assets/schemas/roadmap.schema.json:160", "cmd: python -m tools.validate_roadmap assets/templates/roadmap.sample.json --strict-evidence"]
+    },
+    {
+      "id": "O2",
+      "title": "Relax schema to make next_step optional",
+      "description": "Modify schema to not require next_step (breaking change avoidance).",
+      "expected_outcomes": ["CI passes without modifying existing files"],
+      "risks": ["Inconsistency with HOWTO docs"],
+      "effort": {"time_hours": 0.5, "complexity": "medium"},
+      "evidence": ["docs/HOWTO_ROADMAP_AUTHORING.md:86"]
+    }
+  ],
+  "decision": {
+    "status": "proposed",
+    "chosen_option_id": null,
+    "rationale": "Prefer minimal change with lowest risk."
+  },
+  "approval": {"required": false},
+  "references": [
+    {"claim": "Schema requires next_step", "evidence": "assets/schemas/roadmap.schema.json:18"},
+    {"claim": "Validation command", "evidence": "tools/validate_roadmap.py:126"}
+  ],
+  "next_step": {"what": "Select option and produce plan delta", "owner": "Human"}
+}
+

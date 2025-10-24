@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Roadmap Plan Delta",
+  "type": "object",
+  "required": ["version", "created_at", "decision_id", "target", "ops"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string", "const": "1.0" },
+    "created_at": { "type": "string" },
+    "decision_id": { "type": "string" },
+    "target": { "type": "string", "description": "Target roadmap file path", "default": "roadmap.json" },
+    "ops": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["op", "reason", "references"],
+        "properties": {
+          "op": { "type": "string", "enum": ["add", "update", "remove", "reorder", "set_next_step"] },
+          "reason": { "type": "string" },
+          "references": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+
+          "item": { "type": "object" },
+          "id": { "type": "string" },
+          "fields": { "type": "object" },
+          "order": { "type": "array", "items": { "type": "string" } },
+          "step_id": { "type": "string" },
+          "prompt": { "type": "string" }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": { "properties": { "op": { "const": "add" } } },
+            "then": { "required": ["item"] }
+          },
+          {
+            "if": { "properties": { "op": { "const": "update" } } },
+            "then": { "required": ["id", "fields"] }
+          },
+          {
+            "if": { "properties": { "op": { "const": "remove" } } },
+            "then": { "required": ["id"] }
+          },
+          {
+            "if": { "properties": { "op": { "const": "reorder" } } },
+            "then": { "required": ["order"] }
+          },
+          {
+            "if": { "properties": { "op": { "const": "set_next_step" } } },
+            "then": { "required": ["step_id", "prompt"] }
+          }
+        ]
+      }
+    }
+  }
+}
+

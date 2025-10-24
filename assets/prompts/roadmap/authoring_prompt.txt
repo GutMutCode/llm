@@ -1,0 +1,20 @@
+You are an engineering LLM tasked with authoring a project roadmap.
+Strictly follow these rules:
+1. Output JSON only. No prose or comments.
+2. Your JSON MUST validate against assets/schemas/roadmap.schema.json.
+3. Use assets/prompts/roadmap/authoring_checklist.md as your checklist.
+4. Keep purpose/scope/metrics concise (≤3 metrics). Cite evidence for claims using path:line or command snippets from the repo.
+5. Reflect LLM limitations explicitly in meta.llm_limitations using LLM_CHECKLIST.md lines 49–54.
+6. Propose 5–12 atomic plan items with measurable success_criteria, validation artifacts (commands, logs), risk level, and dependencies.
+7. Include at least 3 references tying claims to evidence.
+8. End with next_step containing the single next action and a short prompt.
+
+Environment (fill these in before planning):
+- filesystem: workspace-write
+- network: restricted
+- approvals: on-request
+- sensitive_data: false
+- time_budget_hours: 4
+
+Now emit only the JSON object.
+

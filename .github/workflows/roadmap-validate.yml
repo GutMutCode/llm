@@ -1,0 +1,42 @@
+name: Roadmap JSON validation
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements-dev.txt ]; then
+            python -m pip install -r requirements-dev.txt
+          else
+            python -m pip install jsonschema
+          fi
+
+      - name: Validate sample roadmap (strict evidence)
+        run: |
+          python -m tools.validate_roadmap assets/templates/roadmap.sample.json --strict-evidence
+
+      - name: Validate repository roadmap files (strict evidence)
+        run: |
+          set -e
+          files=$(find . -type f -name 'roadmap*.json' ! -path './assets/templates/*' || true)
+          if [ -n "$files" ]; then
+            echo "Validating:"
+            echo "$files" | tr ' ' '\n'
+            python -m tools.validate_roadmap --strict-evidence $files
+          else
+            echo 'No additional roadmap*.json files found.'
+          fi
