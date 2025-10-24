@@ -32,7 +32,8 @@ jobs:
       - name: Validate repository roadmap files (strict evidence)
         run: |
           set -e
-          files=$(find . -type f -name 'roadmap*.json' ! -path './assets/templates/*' || true)
+          # Exclude all assets (schemas/templates) to avoid validating non-roadmap JSON like schemas
+          files=$(find . -type f -name 'roadmap*.json' ! -path './assets/*' || true)
           if [ -n "$files" ]; then
             echo "Validating:"
             echo "$files" | tr ' ' '\n'
